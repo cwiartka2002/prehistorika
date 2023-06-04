@@ -1,5 +1,5 @@
 from level.code.player import *
-from drabina import *
+from level.code.drabina import *
 class Level:
     def __init__(self, level_data, surface):
         self.display_surface = surface
@@ -95,6 +95,7 @@ class Level:
 
 
     def run(self):
+        self.climb_ladder()
         self.tiles.update(self.world_shift)
         self.drabina.update(self.world_shift)
         self.tiles.draw(self.display_surface)
