@@ -92,7 +92,7 @@ class Level:
     def horizontal_movment_collision(self):
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites()+ self.zdrowie_sprites.sprites() + self.enemy_sprites.sprites()
+        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites()+ self.zdrowie_sprites.sprites()
         for sprite in obiekty_kolizja :
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
@@ -138,8 +138,6 @@ class Level:
                 if player.on_ceiling and player.direction.y > 0:
                     player.on_ceiling = False
 
-
-
     def run(self):
         self.climb_ladder()
         self.terrain_sprites.draw(self.display_surface)
@@ -153,7 +151,6 @@ class Level:
         self.enemy_sprites.draw(self.display_surface)
         self.enemy_sprites.update(self.worold_shift)
         self.colision()
-        self.dead()
         self.kolizja_sprites.update(self.worold_shift)
         self.statek_sprites.draw(self.display_surface)
         self.statek_sprites.update(self.worold_shift)

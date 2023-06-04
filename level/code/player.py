@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
                 self.attack_flag = False
                 self.status = 'idle'
         self.frame_index += self.animation_speed
-
+        print(self.frame_index)
         if self.frame_index > len(animation):
             self.frame_index = 0
         image = animation[int(self.frame_index)]
