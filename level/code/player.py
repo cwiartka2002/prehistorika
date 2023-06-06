@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations['idle'][self.frame_index]
         self.rect = self.image.get_rect(topleft = pos)
         self.direction = pygame.math.Vector2(0,0)
-        self.speed = 3
+        self.speed = 5
         self.gravity = 0.5
         self.jump_speed = -8
         self.jump_flag = False
@@ -32,23 +32,27 @@ class Player(pygame.sprite.Sprite):
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path)
     def animete(self):
-        animation = self.animations[self.status]
-        if self.attack_flag:
-            self.frame_index += 0.08
-            if int(self.frame_index) >= len(animation):
+        try:
+            animation = self.animations[self.status]
+            if self.attack_flag:
+                self.frame_index += 0.08
+                if int(self.frame_index) >= len(animation):
+                    self.frame_index = 0
+                    self.attack_flag = False
+                    self.status = 'idle'
+            self.frame_index += self.animation_speed
+
+            if self.frame_index > len(animation):
                 self.frame_index = 0
-                self.attack_flag = False
-                self.status = 'idle'
-        self.frame_index += self.animation_speed
-        print(self.frame_index)
-        if self.frame_index > len(animation):
+            image = animation[int(self.frame_index)]
+            if self.facting_right:
+                self.image = image
+            else:
+                flipped_image = pygame.transform.flip(image,True,False)
+                self.image = flipped_image
+        except IndexError:
+
             self.frame_index = 0
-        image = animation[int(self.frame_index)]
-        if self.facting_right:
-            self.image = image
-        else:
-            flipped_image = pygame.transform.flip(image,True,False)
-            self.image = flipped_image
       
 
     def get_status(self):
@@ -103,6 +107,7 @@ class Player(pygame.sprite.Sprite):
                 self.direction.y = -1
 
     def update(self):
+
         self.get_input()
         self.get_status()
         self.animete()

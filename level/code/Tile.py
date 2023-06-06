@@ -1,6 +1,7 @@
 import pygame
 from settings import *
 from support import import_folder
+import time
 class tile(pygame.sprite.Sprite):
     def __init__(self,size,size1,px,py):
         super().__init__()
@@ -41,7 +42,9 @@ class Animated(tile):
 class Enemy(Animated):
     def __init__(self,size,size1,x,y):
         super().__init__(size,size1,x,y,'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/enemy/Monsters_Creatures_Fantasy/Skeleton/walk')
-        self.speed = -2
+        self.speed = -1
+        self.stunned = False
+        self.stunned_time = 5
     def move(self):
         self.rect.x += self.speed
     def reverse(self):
@@ -50,11 +53,22 @@ class Enemy(Animated):
     def direction(self):
         self.speed *= -1
 
+    def hitted(self):
+
+            current_time = time.time()
+            if  current_time - self.stunned_time >= 100000:
+                print("dotk")
+                self.stunned_time = current_time
+                self.rect.x -= self.speed
+
+
+
     def update(self,shift):
+
         self.animate()
         self.move()
         self.reverse()
-        self.rect.x += shift
+        self.rect.x += 0
 
 class Statek(tile):
     def __init__(self,size,size1,px,py,surface):

@@ -4,6 +4,7 @@ from settings import *
 from Tile import *
 from player import *
 from drabina import *
+import time
 class Level:
     def __init__(self, level_data, surface):
         self.worold_shift = 0
@@ -92,7 +93,7 @@ class Level:
     def horizontal_movment_collision(self):
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites()+ self.zdrowie_sprites.sprites()
+        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites()+ self.zdrowie_sprites.sprites() + self.enemy_sprites.sprites()
         for sprite in obiekty_kolizja :
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
@@ -120,7 +121,7 @@ class Level:
 
         player = self.player.sprite
         player.apply_gravity()
-        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites() + self.zdrowie_sprites.sprites()
+        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites() + self.zdrowie_sprites.sprites() + self.enemy_sprites.sprites()
 
         for sprite in obiekty_kolizja:
             if sprite.rect.colliderect(player.rect):
@@ -138,8 +139,20 @@ class Level:
                 if player.on_ceiling and player.direction.y > 0:
                     player.on_ceiling = False
 
+    def attack(self):
+        player = self.player.sprite
+        enemy_collide = pygame.sprite.spritecollide(player, self.enemy_sprites, False)
+        if enemy_collide:
+
+            enemy = enemy_collide[0]
+            enemy.hitted()
+
+
+
+
     def run(self):
         self.climb_ladder()
+        self.attack()
         self.terrain_sprites.draw(self.display_surface)
         self.terrain_sprites.update(self.worold_shift)
         self.za_drabina_sprites.draw(self.display_surface)
@@ -158,3 +171,4 @@ class Level:
         self.player.draw(self.display_surface)
         self.horizontal_movment_collision()
         self.vertical_movment_collision()
+
