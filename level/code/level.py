@@ -35,6 +35,8 @@ class Level:
 
         za_drabina = import_csv_layout(level_data['za_drabina'])
         self.za_drabina_sprites = self.create_tile_group(za_drabina, 'za_drabina')
+
+        self.flag_cam_move = False
     def create_tile_group(self, layout, type):
         sprite_group = pygame.sprite.Group()
         for index, row in enumerate(layout):
@@ -147,26 +149,49 @@ class Level:
             enemy = enemy_collide[0]
             enemy.hitted()
 
+    def cam_move(self):
+        player = self.player.sprite
+        if player.rect.x < 0 :
+            self.shift_world(screen_width//2)
+        elif player.rect.x > screen_width :
+            self.shift_world(-screen_width//2)
 
-
+    def shift_world(self, shift_x):
+        self.worold_shift += shift_x
+        for sprite in self.terrain_sprites.sprites():
+            sprite.rect.x += shift_x
+        for sprite in self.statek_sprites.sprites():
+            sprite.rect.x += shift_x
+        for sprite in self.zdrowie_sprites.sprites():
+            sprite.rect.x += shift_x
+        for sprite in self.enemy_sprites.sprites():
+            sprite.rect.x += shift_x
+        for sprite in self.kolizja_sprites.sprites():
+            sprite.rect.x += shift_x
+        for sprite in self.za_drabina_sprites.sprites():
+            sprite.rect.x += shift_x
+        for sprite in self.drabina_sprites.sprites():
+            sprite.rect.x += shift_x
+        self.player.sprite.rect.x += shift_x *2
 
     def run(self):
         self.climb_ladder()
         self.attack()
         self.terrain_sprites.draw(self.display_surface)
-        self.terrain_sprites.update(self.worold_shift)
+
         self.za_drabina_sprites.draw(self.display_surface)
-        self.za_drabina_sprites.update(self.worold_shift)
+
         self.drabina_sprites.draw(self.display_surface)
-        self.drabina_sprites.update(self.worold_shift)
+
         self.zdrowie_sprites.draw(self.display_surface)
-        self.zdrowie_sprites.update(self.worold_shift)
+
         self.enemy_sprites.draw(self.display_surface)
         self.enemy_sprites.update(self.worold_shift)
         self.colision()
-        self.kolizja_sprites.update(self.worold_shift)
+        self.cam_move()
+
         self.statek_sprites.draw(self.display_surface)
-        self.statek_sprites.update(self.worold_shift)
+
         self.player.update()
         self.player.draw(self.display_surface)
         self.horizontal_movment_collision()
