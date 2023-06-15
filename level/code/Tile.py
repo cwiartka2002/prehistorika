@@ -53,13 +53,7 @@ class Enemy(Animated):
     def direction(self):
         self.speed *= -1
 
-    def hitted(self):
 
-            current_time = time.time()
-            if  current_time - self.stunned_time >= 100000:
-                print("dotk")
-                self.stunned_time = current_time
-                self.rect.x -= self.speed
 
 
 

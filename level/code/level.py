@@ -141,19 +141,13 @@ class Level:
                 if player.on_ceiling and player.direction.y > 0:
                     player.on_ceiling = False
 
-    def attack(self):
-        player = self.player.sprite
-        enemy_collide = pygame.sprite.spritecollide(player, self.enemy_sprites, False)
-        if enemy_collide:
 
-            enemy = enemy_collide[0]
-            enemy.hitted()
 
     def cam_move(self):
         player = self.player.sprite
         if player.rect.x < 0 :
             self.shift_world(screen_width//2)
-        elif player.rect.x > screen_width :
+        elif player.rect.x > screen_width:
             self.shift_world(-screen_width//2)
 
     def shift_world(self, shift_x):
@@ -176,7 +170,7 @@ class Level:
 
     def run(self):
         self.climb_ladder()
-        self.attack()
+        print(self.player.sprite.rect.y)
         self.terrain_sprites.draw(self.display_surface)
 
         self.za_drabina_sprites.draw(self.display_surface)
