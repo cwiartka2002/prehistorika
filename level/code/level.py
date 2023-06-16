@@ -4,7 +4,10 @@ from settings import *
 from Tile import *
 from player import *
 from drabina import *
-import time
+import os
+
+from inforamacje import *
+
 class Level:
     def __init__(self, level_data, surface):
         self.worold_shift = 0
@@ -37,6 +40,16 @@ class Level:
         self.za_drabina_sprites = self.create_tile_group(za_drabina, 'za_drabina')
 
         self.flag_cam_move = False
+
+
+        self.pd = 0
+
+        self.poinnts = 0
+
+        self.lifes = 3
+        self.interface = UI(pygame.display.set_mode((screen_width, screen_height)))
+
+        self.enemy_flag = False
     def create_tile_group(self, layout, type):
         sprite_group = pygame.sprite.Group()
         for index, row in enumerate(layout):
@@ -92,10 +105,11 @@ class Level:
             if pygame.sprite.spritecollide(enemy, self.kolizja_sprites, False):
                 enemy.direction()
 
+
     def horizontal_movment_collision(self):
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites()+ self.zdrowie_sprites.sprites() + self.enemy_sprites.sprites()
+        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites()+ self.zdrowie_sprites.sprites()
         for sprite in obiekty_kolizja :
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
@@ -123,7 +137,7 @@ class Level:
 
         player = self.player.sprite
         player.apply_gravity()
-        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites() + self.zdrowie_sprites.sprites() + self.enemy_sprites.sprites()
+        obiekty_kolizja = self.terrain_sprites.sprites()  + self.statek_sprites.sprites() + self.zdrowie_sprites.sprites()
 
         for sprite in obiekty_kolizja:
             if sprite.rect.colliderect(player.rect):
@@ -140,6 +154,19 @@ class Level:
                     player.on_ground = False
                 if player.on_ceiling and player.direction.y > 0:
                     player.on_ceiling = False
+
+    def enemy_colision(self):
+        player = self.player.sprite
+        colision = pygame.sprite.spritecollide(self.player.sprite, self.enemy_sprites, False)
+        if colision and not self.enemy_flag:
+            for enemy in colision:
+                if not enemy.moving_left and player.facting_right:
+                    enemy.direction()
+                self.interface.update_health(1)
+                player.hitted()
+            self.enemy_flag = True
+        elif not colision:
+            self.enemy_flag = False
 
 
 
@@ -170,7 +197,7 @@ class Level:
 
     def run(self):
         self.climb_ladder()
-        print(self.player.sprite.rect.y)
+
         self.terrain_sprites.draw(self.display_surface)
 
         self.za_drabina_sprites.draw(self.display_surface)
@@ -183,11 +210,15 @@ class Level:
         self.enemy_sprites.update(self.worold_shift)
         self.colision()
         self.cam_move()
-
+        self.enemy_colision()
         self.statek_sprites.draw(self.display_surface)
 
         self.player.update()
         self.player.draw(self.display_surface)
         self.horizontal_movment_collision()
         self.vertical_movment_collision()
+        self.text_points = Text(self.poinnts, pygame.color.THECOLORS['lightblue'],  1100, 50, font_size=76)
+        self.text_points.draw(self.display_surface)
+        self.interface.show_health()
+
 

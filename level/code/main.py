@@ -5,6 +5,7 @@ from level import *
 from game_data import *
 from Menu import *
 
+
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()

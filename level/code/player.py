@@ -31,36 +31,44 @@ class Player(pygame.sprite.Sprite):
         for animation in self.animations.keys():
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path)
+
     def animete(self):
         try:
             animation = self.animations[self.status]
-            if self.attack_flag:
-                self.frame_index += 0.08
-                if int(self.frame_index) >= len(animation):
-                    self.frame_index = 0
-                    self.attack_flag = False
-                    self.status = 'idle'
-            self.frame_index += self.animation_speed
 
-            if self.frame_index > len(animation):
+            if self.attack_flag or self.status == 'hit':
+
+                self.frame_index += 0.5 # Increase the frame index faster for attack animation
+                if int(self.frame_index) >= len(animation):
+                    self.frame_index = len(animation) - 1  # Set the frame index to the last frame
+                    self.attack_flag = False
+                    self.status = 'idle'  # Return to idle status after attack
+
+            else:
+                self.frame_index += self.animation_speed
+
+            if self.frame_index >= len(animation):
                 self.frame_index = 0
             image = animation[int(self.frame_index)]
             if self.facting_right:
                 self.image = image
             else:
-                flipped_image = pygame.transform.flip(image,True,False)
+                flipped_image = pygame.transform.flip(image, True, False)
                 self.image = flipped_image
         except IndexError:
-
             self.frame_index = 0
-      
+
+    def hitted(self):
+        self.status = 'hit'
+
+        self.animete()
 
     def get_status(self):
         keys = pygame.key.get_pressed()
 
         if self.direction.y <0:
             self.status = 'jump'
-        elif self.direction.y > 1:
+        elif self.direction.y > 1.1:
             self.status = 'fall'
         else:
             if self.direction.x != 0:
@@ -90,7 +98,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y
     def jump(self):
         if not self.jump_flag:
-            print("pressed")
+
             self.direction.y += self.jump_speed
             self.jump_flag = True
 

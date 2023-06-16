@@ -45,11 +45,16 @@ class Enemy(Animated):
         self.speed = -1
         self.stunned = False
         self.stunned_time = 5
+        self.moving_left = True
+
     def move(self):
         self.rect.x += self.speed
     def reverse(self):
         if self.speed < 0:
             self.image = pygame.transform.flip(self.image,True,False)
+            self.moving_left = False  # Update the flag when reversing direction
+        else:
+            self.moving_left = True
     def direction(self):
         self.speed *= -1
 
