@@ -1,0 +1,10 @@
+penemy:
+umieranie, oszołowenie, atak(wręcz, dystans), umieranie
+player: 
+plywanie, atak, dostanie obrażenia, zabicie
+tło:
+niebo, woda(pływanie)
+satek:
+animacja odpłyniecia, poza mape koniec gry.
+kamera:
+przesuwanie cłości po wyjściu poza ekran
