@@ -105,6 +105,7 @@ class Player(pygame.sprite.Sprite):
             self.jump_flag = True
 
 
+
     def climb(self):
 
             keys = pygame.key.get_pressed()

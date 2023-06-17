@@ -22,6 +22,7 @@ def import_cut_graphics(path, tile_size,tile_size1):
             cut_tiles.append(new_surf)
     return cut_tiles
 
+
 def import_folder(path):
         surface_lisr = []
         print(path)

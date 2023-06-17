@@ -19,6 +19,7 @@ class UI:
             return False
         except FileNotFoundError:
             self.obecna == 1
+
 class Text:
     def __init__(self, text, text_colour, px, py, font_type=None, font_size=74):
         self.text = str(text)

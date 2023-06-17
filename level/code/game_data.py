@@ -9,4 +9,5 @@ level_0 = {
     'behind_ladder' : 'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/level/0/level_00_za_drabina.csv',
     'health' : 'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/level/0/level_00_health.csv'
 
+
 }
