@@ -1,4 +1,5 @@
 import pygame
+import sys
 class UI:
     def __init__(self,surface):
         self.display_surface = surface
@@ -9,9 +10,15 @@ class UI:
         self.display_surface.blit(self.health_bar,(20,10))
 
     def update_health(self, value):
-
-        self.obecna += value
-        self.health_bar = pygame.image.load(self.path + str(self.obecna)+'.png')
+        try:
+            self.obecna += value
+            self.health_bar = pygame.image.load(self.path + str(self.obecna)+'.png')
+            if self.obecna > 9:
+                self.obecna =0
+                return True
+            return False
+        except FileNotFoundError:
+            self.obecna == 1
 class Text:
     def __init__(self, text, text_colour, px, py, font_type=None, font_size=74):
         self.text = str(text)

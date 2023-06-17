@@ -13,15 +13,14 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2(0,0)
         self.speed = 5
         self.gravity = 0.5
-        self.jump_speed = -8
+        self.jump_speed = -16
         self.jump_flag = False
         self.climbing = False
         self.status = 'idle'
-        self.facting_right = True
+        self.facing_right = True
         self.on_ground = False
-        self.on_ceiling = False
-        self.on_right = False
-        self.on_left = False
+
+
         self.attack_flag = False
         self.na_drabinie = False
 
@@ -50,7 +49,7 @@ class Player(pygame.sprite.Sprite):
             if self.frame_index >= len(animation):
                 self.frame_index = 0
             image = animation[int(self.frame_index)]
-            if self.facting_right:
+            if self.facing_right:
                 self.image = image
             else:
                 flipped_image = pygame.transform.flip(image, True, False)
@@ -58,7 +57,7 @@ class Player(pygame.sprite.Sprite):
         except IndexError:
             self.frame_index = 0
 
-    def hitted(self):
+    def hit(self):
         self.status = 'hit'
 
         self.animete()
@@ -78,19 +77,22 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             self.status = 'attack'
             self.attack_flag = True
+
     def get_input(self):
         keys = pygame.key.get_pressed()
-        if not self.attack_flag or  self.na_drabinie:
+        if not self.attack_flag or self.na_drabinie:
             if keys[pygame.K_RIGHT]:
                 self.direction.x = 1
-                self.facting_right = True
+                self.facing_right = True
             elif keys[pygame.K_LEFT]:
                 self.direction.x = -1
-                self.facting_right = False
+                self.facing_right = False
             else:
                 self.direction.x = 0
             if keys[pygame.K_UP] and self.on_ground:
                 self.jump()
+            if keys[pygame.K_SPACE]:
+                self.attack_flag = True
 
 
     def apply_gravity(self):
@@ -119,6 +121,8 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
         self.get_status()
         self.animete()
+
+
 
 
 
