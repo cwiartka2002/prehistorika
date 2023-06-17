@@ -4,7 +4,7 @@ class GameOverScreen:
     def __init__(self, screen):
         self.screen = screen
         self.font = pygame.font.Font(None, 100)
-        self.color = (255, 0, 255)  # Fioletowy kolor
+        self.color = (255, 0, 255)  # Fioletowy kolor`
 
 
     def display_game_over(self,text):
