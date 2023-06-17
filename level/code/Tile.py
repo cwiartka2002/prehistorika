@@ -18,11 +18,19 @@ class StaticTile(tile):
 
 
 
+
+
+
+
+
 class Zdrowie(StaticTile):
     def __init__(self, size,size1, x, y, surface):
         super().__init__(size,size1, x, y,surface)
         offset = y +size
         self.rect = self.image.get_rect(bottomleft = (x,offset))
+
+
+
 
 class Animated(tile):
     def __init__(self,siez,size1,x,y,path):
@@ -39,13 +47,26 @@ class Animated(tile):
     def update(self,shift):
         self.animate()
         self.rect.x += shift
+class Moving_Terrain(StaticTile):
+        def __init__(self, size, size1, x, y, surface):
+            super().__init__(size, size1, x, y, surface)
+            offset = y + size
+            self.rect = self.image.get_rect(bottomleft=(x, offset))
+
+        def move(self):
+            if not self.stunned:
+                self.rect.x += self.speed
+
+        def change_direction(self):
+            self.speed *= -1
 class Enemy(Animated):
-    def __init__(self,size,size1,x,y):
-        super().__init__(size,size1,x,y,'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/enemy/Monsters_Creatures_Fantasy/Skeleton/walk')
+    def __init__(self,size,size1,x,y, surface):
+        super().__init__(size,size1,x,y,surface)
         self.speed = -1
         self.stunned = False
         self.stunned_time = 3
         self.moving_left = True
+
 
     def move(self):
         if not self.stunned:

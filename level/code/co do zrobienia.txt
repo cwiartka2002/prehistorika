@@ -1,10 +1,7 @@
 penemy:
-umieranie, oszołowenie, atak(wręcz, dystans), umieranie
+now wróg atakujacy z daleka
 player: 
-plywanie, atak, dostanie obrażenia, zabicie
+
 tło:
-niebo, woda(pływanie)
-satek:
-animacja odpłyniecia, poza mape koniec gry.
-kamera:
-przesuwanie cłości po wyjściu poza ekran
+niebo
+

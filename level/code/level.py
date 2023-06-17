@@ -19,6 +19,8 @@ class Level:
         terrain_layout = import_csv_layout(level_data['terrain'])
         self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain')
         ladder_layout = import_csv_layout(level_data['ladder'])
+        moving_terrain_layout = import_csv_layout(level_data['moving_terrain'])
+        self.moving_terrain_sprites = self.create_tile_group(moving_terrain_layout, 'moving_terrain')
         self.ladder_sprites = self.create_tile_group(ladder_layout, 'ladder')
         enemy_layout = import_csv_layout(level_data['enemy'])
         self.enemy_sprites = self.create_tile_group(enemy_layout, 'enemy')
@@ -63,13 +65,19 @@ class Level:
                         behind_ladder_surface = behind_ladder_surface[int(val)]
                         sprite = StaticTile(tile_size, tile_size, x, y, behind_ladder_surface)
                     elif type == 'enemy':
-                        sprite = Enemy(tile_size, tile_size, x, y)
+                        sprite = Enemy(tile_size, tile_size, x, y,'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/enemy/Monsters_Creatures_Fantasy/Skeleton/walk')
                     elif type == 'collision':
                         sprite = tile(tile_size, tile_size, x, y)
                     elif type == 'ship':
                         ship_tile_list = import_cut_graphics('graphics/teren/Ship/ship13.png', 64, 64)
                         ship_surface = ship_tile_list[int(val)]
                         sprite = Ship(tile_size, tile_size, x, y, ship_surface)
+                    elif type == 'moving_terrain':
+                        moving_terrain_list = import_cut_graphics('graphics/teren/[64x64] Rocky Grass.png', tile_size,
+                                                                tile_size)
+                        moving_terrain_surface = moving_terrain_list[int(val)]
+                        sprite = Moving_Terrain(tile_size, tile_size, x, y, moving_terrain_surface)
+
                     elif type == 'health':
                         health_surface = pygame.image.load('graphics/teren/hearths/2.png')
                         sprite = Health(64, 64, x, y, health_surface)
@@ -84,6 +92,12 @@ class Level:
                 if val != '-1':
                     sprite = Player((x, y))
                     self.player.add(sprite)
+
+
+    def terrain_collision(self):
+        for terrain in self.moving_terrain_sprites.sprites():
+            if pygame.sprite.spritecollide(terrain, self.collision_sprites, False):
+                terrain.change_direction()
 
     def collision(self):
         for enemy in self.enemy_sprites.sprites():
