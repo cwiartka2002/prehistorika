@@ -67,7 +67,6 @@ class Enemy(Animated):
 
 
 
-
     def update(self,shift):
 
         self.animate()

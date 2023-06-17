@@ -7,7 +7,6 @@ class GameOverScreen:
         self.color = (255, 0, 255)  # Fioletowy kolor
 
 
-
     def display_game_over(self,text):
         self.screen.fill((0, 0, 0))  # Wypełnienie ekranu czarnym kolorem
         text = self.font.render(text, True, self.color)

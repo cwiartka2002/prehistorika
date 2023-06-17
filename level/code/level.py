@@ -103,7 +103,6 @@ class Level:
                     player.rect.right = sprite.rect.left
                     self.current_x = player.rect.right
 
-
     def climb_ladder(self):
         player = self.player.sprite
         ladder_collision = pygame.sprite.spritecollide(player, self.ladder_sprites, False)
