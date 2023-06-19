@@ -2,10 +2,12 @@ import pygame
 from settings import *
 from support import import_folder
 import time
+from Fire import *
 class tile(pygame.sprite.Sprite):
     def __init__(self,size,size1,px,py):
         super().__init__()
-        self.image = pygame.Surface((size,size1))
+        self.image = pygame.Surface((size,size1)).convert_alpha()
+
         self.rect = self.image.get_rect(topleft = (px, py))
 
     def update(self, shift):
@@ -52,16 +54,22 @@ class Moving_Terrain(StaticTile):
             super().__init__(size, size1, x, y, surface)
             offset = y + size
             self.rect = self.image.get_rect(bottomleft=(x, offset))
+            self.speed = 1
 
         def move(self):
-            if not self.stunned:
-                self.rect.x += self.speed
+                self.rect.y += self.speed
 
         def change_direction(self):
             self.speed *= -1
+
+        def update(self, shift):
+
+            self.move()
+
 class Enemy(Animated):
     def __init__(self,size,size1,x,y, surface):
         super().__init__(size,size1,x,y,surface)
+        self.rect = self.image.get_rect(bottomleft=(x, y + 64))
         self.speed = -1
         self.stunned = False
         self.stunned_time = 3
@@ -93,6 +101,45 @@ class Enemy(Animated):
         self.animate()
         self.move()
         self.reverse()
+
+class Shooting_Enemy(Enemy):
+    def __init__(self, size, size1, x, y, surface):
+        super().__init__(size, size1, x, y, surface)
+        self.original_surface = self.image  # Zapamiętaj oryginalny obrazek
+        self.last_shot_time = 0
+        self.set_of_bullets = pygame.sprite.Group()
+        self.last_shot_time = 0
+        self.shoot_delay = 5000
+
+    def face_left(self):
+        self.direction = pygame.Vector2(1, 0)  # Ustaw kierunek w prawo (1, 0)
+        self.image = self.original_surface  # Przywróć oryginalny obrazek
+
+    def face_right(self):
+        self.direction = pygame.Vector2(-1, 0)  # Ustaw kierunek w lewo (-1, 0)
+        self.image = pygame.transform.flip(self.original_surface, True, False)  # Obróć obrazek w poziomie
+
+
+    def shoot(self):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_shot_time >= self.shoot_delay:
+            bullet_direction = pygame.Vector2(self.direction.x, self.direction.y)  # Pass the direction to the bullet
+            fire = Fire(self.rect.centerx, self.rect.centery, bullet_direction)
+            self.set_of_bullets.add(fire)
+            self.last_shot_time = current_time
+
+
+    def animate(self):
+        self.frame_index += 0.1
+        if self.frame_index > 4:
+            self.frame_index = 0
+        self.image = self.frames[int(self.frame_index)]
+        self.original_surface = self.image
+
+    def update(self, shift):
+        self.animate()
+        self.reverse()
+        self.shoot()
 class Health(StaticTile):
     def __init__(self, size,size1, x, y, surface):
         super().__init__(size,size1, x, y,surface)
@@ -129,8 +176,3 @@ class Ship(tile):
 
     def update(self,shift):
         self.rect.x += shift
-
-
-
-
-

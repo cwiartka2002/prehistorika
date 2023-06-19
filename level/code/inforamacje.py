@@ -21,10 +21,10 @@ class UI:
             self.obecna == 1
 
 class Text:
-    def __init__(self, text, text_colour, px, py, font_type=None, font_size=74):
-        self.text = str(text)
-        font = pygame.font.SysFont(font_type, font_size)
-        self.image = font.render(self.text, True, text_colour)
+    def __init__(self, text, text_colour, px, py, font_type=None, font_size = 74):
+
+        font = pygame.font.Font( 'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/text/for_text.ttf', font_size)
+        self.image = font.render(text, True, text_colour)
         self.rect = self.image.get_rect()
         self.rect.center = px, py
 

@@ -4,7 +4,7 @@ from settings import *
 from level import *
 from game_data import *
 from Menu import *
-
+from background import *
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))

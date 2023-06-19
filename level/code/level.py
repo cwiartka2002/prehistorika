@@ -7,6 +7,8 @@ from drabina import *
 import os
 from game_over import *
 from inforamacje import *
+import math
+from background import *
 class Level:
     def __init__(self, level_data, surface):
         self.world_shift = 0
@@ -24,6 +26,8 @@ class Level:
         self.ladder_sprites = self.create_tile_group(ladder_layout, 'ladder')
         enemy_layout = import_csv_layout(level_data['enemy'])
         self.enemy_sprites = self.create_tile_group(enemy_layout, 'enemy')
+        shooting_enemy_layout = import_csv_layout(level_data['shooting_enemy'])
+        self.shooting_enemy_sprites = self.create_tile_group(shooting_enemy_layout, 'shooting_enemy')
         crate_layout = import_csv_layout(level_data['crate'])
         self.crate_sprites = self.create_tile_group(crate_layout, 'crate')
         collision_layout = import_csv_layout(level_data['collision'])
@@ -35,13 +39,16 @@ class Level:
         self.flag_cam_move = False
         self.pd = 0
         self.points = 0
-        self.lives = 1
+        self.lives = 5
         self.interface = UI(pygame.display.set_mode((screen_width, screen_height)))
         self.enemy_flag = False
         self.crate_flag = False
         self.end_game = False
         self.counter = 0
         self.game_over = GameOverScreen(self.display_surface)
+
+        self.sky = Sky()
+
 
     def create_tile_group(self, layout, type):
         sprite_group = pygame.sprite.Group()
@@ -52,7 +59,7 @@ class Level:
                     y = index * tile_size
                     if type == 'terrain':
                         terrain_tile_list = import_cut_graphics('graphics/teren/[64x64] Rocky Grass.png', tile_size, tile_size)
-                        tile_surface = terrain_tile_list[int(val)]
+                        tile_surface = terrain_tile_list[int(val)].convert_alpha()
                         sprite = StaticTile(tile_size, tile_size, x, y, tile_surface)
                     elif type == 'ladder':
                         drabina_surface = pygame.image.load('C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/teren/ladder/28x128/2.png')
@@ -62,20 +69,21 @@ class Level:
                         sprite = Skrzynka(64, 64, x, y, path)
                     elif type == 'behind_ladder':
                         behind_ladder_surface = import_cut_graphics('graphics/teren/[64x64] Rocky Grass.png', tile_size, tile_size)
-                        behind_ladder_surface = behind_ladder_surface[int(val)]
+                        behind_ladder_surface = behind_ladder_surface[int(val)].convert_alpha()
                         sprite = StaticTile(tile_size, tile_size, x, y, behind_ladder_surface)
                     elif type == 'enemy':
                         sprite = Enemy(tile_size, tile_size, x, y,'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/enemy/Monsters_Creatures_Fantasy/Skeleton/walk')
+                    elif type == 'shooting_enemy':
+                        sprite = Shooting_Enemy(tile_size, tile_size, x, y,'C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/enemy/Monsters_Creatures_Fantasy/Flying_eye/idle')
                     elif type == 'collision':
                         sprite = tile(tile_size, tile_size, x, y)
                     elif type == 'ship':
-                        ship_tile_list = import_cut_graphics('graphics/teren/Ship/ship13.png', 64, 64)
-                        ship_surface = ship_tile_list[int(val)]
+                        ship_surface = pygame.image.load('C:/Users/kacpe/OneDrive/Desktop/Prehistorika_by_kacper/graphics/teren/Ship/ship13.png').convert_alpha()
                         sprite = Ship(tile_size, tile_size, x, y, ship_surface)
                     elif type == 'moving_terrain':
                         moving_terrain_list = import_cut_graphics('graphics/teren/[64x64] Rocky Grass.png', tile_size,
                                                                 tile_size)
-                        moving_terrain_surface = moving_terrain_list[int(val)]
+                        moving_terrain_surface = moving_terrain_list[int(val)].convert_alpha()
                         sprite = Moving_Terrain(tile_size, tile_size, x, y, moving_terrain_surface)
 
                     elif type == 'health':
@@ -107,7 +115,7 @@ class Level:
     def horizontal_movement_collision(self):
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-        collision_objects = self.terrain_sprites.sprites()
+        collision_objects = self.terrain_sprites.sprites() + self.moving_terrain_sprites.sprites()
         for sprite in collision_objects:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
@@ -128,7 +136,7 @@ class Level:
     def vertical_movement_collision(self):
         player = self.player.sprite
         player.apply_gravity()
-        collision_objects = self.terrain_sprites.sprites()
+        collision_objects = self.terrain_sprites.sprites() + self.moving_terrain_sprites.sprites()
         for sprite in collision_objects:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.y > 0:
@@ -159,8 +167,10 @@ class Level:
                 health.kill()
 
     def enemy_collision(self):
+
         player = self.player.sprite
         collision = pygame.sprite.spritecollide(player, self.enemy_sprites, False)
+        collison1 = pygame.sprite.spritecollide(player, self.shooting_enemy_sprites,False)
         if collision and not self.enemy_flag:
             for enemy in collision:
                 if player.status == 'attack':
@@ -183,28 +193,56 @@ class Level:
         elif not collision:
             self.enemy_flag = False
 
+        if collison1:
+            for enemy in collison1:
+                if player.status == 'attack':
+                    enemy.kill()
+                    self.points += 100
+                else:
+                    player.hit()
+
+
+    def fire_collision(self, enemy):
+        player = self.player.sprite
+        if pygame.sprite.spritecollide(player, enemy.set_of_bullets, True) and player.status != 'attack':
+            player.hit()
+            if self.interface.update_health(1):
+                self.lives -= 1
+
+    def face_player(self, enemy):
+        player = self.player.sprite
+        if player.rect.x < enemy.rect.x:
+
+            enemy.face_right()
+        else:
+
+            enemy.face_left()
     def camera_movement(self):
         player = self.player.sprite
-        if 0 <= self.counter < 3:
+
+        if 0 <= self.counter <= 3:
             if player.rect.x < 0:
-                self.shift_world(screen_width // 2)
+                self.shift_world(screen_width )
                 self.counter -= 1
             elif player.rect.x > screen_width:
-                self.shift_world(-screen_width // 2)
+                self.shift_world(-screen_width )
                 self.counter += 1
         else:
             self.shift_world(0)
 
     def shift_world(self, shift_x):
         self.world_shift += shift_x
-        objects = self.terrain_sprites.sprites() + self.ship_sprites.sprites() + self.crate_sprites.sprites() + self.enemy_sprites.sprites() + self.collision_sprites.sprites() + self.ladder_sprites.sprites() + self.health_sprites.sprites()
+        objects = self.terrain_sprites.sprites() + self.ship_sprites.sprites() + self.crate_sprites.sprites() + self.enemy_sprites.sprites() + self.collision_sprites.sprites() + self.ladder_sprites.sprites() + self.health_sprites.sprites() + self.moving_terrain_sprites.sprites() + self.shooting_enemy_sprites.sprites()
         for sprite in objects:
             sprite.rect.x += shift_x
-        self.player.sprite.rect.x += shift_x * 2
+        self.player.sprite.rect.x += shift_x
 
     def game_over_check(self):
         if self.lives == 0 or self.player.sprite.rect.y > screen_height + 500 and not self.end_game:
-            self.gameover.display_game_over("GAME OVER")
+            self.game_over.display_game_over("GAME OVER", self.points)
+        if self.end_game:
+            self.game_over.display_game_over("Gratulacje", self.points)
+
 
     def move_ship(self):
         player = self.player.sprite
@@ -214,21 +252,41 @@ class Level:
                 ship.rect.x += 10
                 player.gravity = 0
                 player.rect.x = ship.rect.x
-                if ship.rect.x > 1200 or self.game_over:
-                    self.gameover.display_game_over("Gratualcje")
+                if ship.rect.x > 1200:
+
+                    self.end_game = True
 
                 player.on_ship = True
+
         else:
             player.gravity = 0.5
+        print(self.end_game)
+
+
 
     def run(self):
+        self.sky.draw(self.display_surface)
         self.climb_ladder()
+
+        self.terrain_collision()
         self.ladder_sprites.draw(self.display_surface)
         self.terrain_sprites.draw(self.display_surface)
+        self.moving_terrain_sprites.draw(self.display_surface)
+        self.moving_terrain_sprites.update(self.display_surface)
         self.ship_sprites.draw(self.display_surface)
         self.crate_sprites.draw(self.display_surface)
         self.enemy_sprites.draw(self.display_surface)
         self.enemy_sprites.update(self.world_shift)
+        self.shooting_enemy_sprites.draw(self.display_surface)
+        self.shooting_enemy_sprites.update(self.world_shift)
+        self.shooting_enemy_sprites.draw(self.display_surface)
+        self.shooting_enemy_sprites.update(self.world_shift)
+        for enemy in self.shooting_enemy_sprites:
+            self.face_player(enemy)
+            self.fire_collision(enemy)
+            enemy.shoot()
+            enemy.set_of_bullets.draw(self.display_surface)
+            enemy.set_of_bullets.update()
         self.collision()
         self.camera_movement()
         self.enemy_collision()
@@ -237,11 +295,10 @@ class Level:
         self.player.draw(self.display_surface)
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
-        self.points_text = Text(self.points, pygame.color.THECOLORS['lightblue'], 1100, 50, font_size=76)
-        self.lives_text = Text(self.lives, pygame.color.THECOLORS['red'], 500, 50, font_size=76)
+        self.points_text = Text("Points:" + str(self.points), pygame.color.THECOLORS['white'], 1100, 50, font_size=36)
+        self.lives_text = Text("Lives: "+str(self.lives), pygame.color.THECOLORS['red'], 500, 50, font_size=36)
         self.points_text.draw(self.display_surface)
         self.lives_text.draw(self.display_surface)
         self.interface.show_health()
         self.move_ship()
         self.game_over_check()
-
