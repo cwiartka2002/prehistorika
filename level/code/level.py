@@ -66,7 +66,7 @@ class Level:
                         sprite = StaticTile(28, 64, x, y, drabina_surface)
                     elif type == 'crate':
                         path = 'graphics/teren/box/'
-                        sprite = Skrzynka(64, 64, x, y, path)
+                        sprite = Skrzynka(tile_size, tile_size, x, y, path)
                     elif type == 'behind_ladder':
                         behind_ladder_surface = import_cut_graphics('graphics/teren/[64x64] Rocky Grass.png', tile_size, tile_size)
                         behind_ladder_surface = behind_ladder_surface[int(val)].convert_alpha()
@@ -209,14 +209,14 @@ class Level:
             if self.interface.update_health(1):
                 self.lives -= 1
 
+
     def face_player(self, enemy):
         player = self.player.sprite
         if player.rect.x < enemy.rect.x:
-
             enemy.face_right()
         else:
-
             enemy.face_left()
+        enemy.image = pygame.transform.flip(enemy.original_surface, not enemy.moving_left, False)
     def camera_movement(self):
         player = self.player.sprite
 
@@ -281,9 +281,12 @@ class Level:
         self.shooting_enemy_sprites.update(self.world_shift)
         self.shooting_enemy_sprites.draw(self.display_surface)
         self.shooting_enemy_sprites.update(self.world_shift)
+
         for enemy in self.shooting_enemy_sprites:
             self.face_player(enemy)
             self.fire_collision(enemy)
+            for bullet in enemy.set_of_bullets:
+                bullet.rect.x += self.world_shift
             enemy.shoot()
             enemy.set_of_bullets.draw(self.display_surface)
             enemy.set_of_bullets.update()

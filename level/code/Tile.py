@@ -90,7 +90,7 @@ class Enemy(Animated):
 
     def stun(self):
         if not self.stunned:
-            print("Stunned")
+
             self.stunned = True
             self.stunned_start_time = time.time()
 
