@@ -10,8 +10,8 @@ class Fire(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image,True,False)
 
     def update(self):
-        self.rect.x += self.direction.x  # Update the bullet's x position based on the direction
-        self.rect.y += self.direction.y  # Update the bullet's y position based on the direction
+        self.rect.x += self.direction.x
+        self.rect.y += self.direction.y
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)

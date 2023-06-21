@@ -16,24 +16,11 @@ class StaticTile(tile):
     def __init__(self, size,size1,x,y,surface):
         super().__init__(size,size1,x,y)
         self.image = surface
-
-
-
-
-
-
-
-
-
 class Zdrowie(StaticTile):
     def __init__(self, size,size1, x, y, surface):
         super().__init__(size,size1, x, y,surface)
         offset = y +size
         self.rect = self.image.get_rect(bottomleft = (x,offset))
-
-
-
-
 class Animated(tile):
     def __init__(self,siez,size1,x,y,path):
         super().__init__(siez,size1,x,y)
